@@ -1,0 +1,29 @@
+[tool.poetry]
+name = "autosedia"
+version = "0.1.0"
+description = ""
+authors = ["Mitchell Lee Taylor"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "3.11.7"
+matplotlib = "3.7.1"
+numpy = "1.23.5"
+Pillow = "9.5.0"
+scipy = "1.11.1"
+scikit-image = "0.20.0"
+pandas = "2.0.2"
+opencv-python = "4.7.0.72"
+torch = "2.0.0"
+
+[tool.poetry.scripts]
+autosedia = "autosedia.autosedia:main"
+
+[tool.setuptools]
+include-package-data = true
+packages = ["src"]
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
