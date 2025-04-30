@@ -1,10 +1,46 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# === Determine the folder this script is running from ===
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# === Save the log file to the same folder ===
+LOG_FILE="$SCRIPT_DIR/autosedia_install.log"
+
+# === Ensure the log file exists, so tail won’t error out ===
+mkdir -p "$(dirname "$LOG_FILE")"
+: > "$LOG_FILE"
+
+# === Open a new terminal window to follow the log ===
+OS="$(uname)"
+if [[ "$OS" == "Darwin" ]]; then
+  # macOS: use AppleScript to open Terminal.app and tail the log
+  osascript <<EOF
+tell application "Terminal"
+  do script "tail -f \"$LOG_FILE\""
+  activate
+end tell
+EOF
+elif [[ "$OS" == "Linux" ]]; then
+  # Linux: try gnome-terminal, then xterm
+  if command -v gnome-terminal >/dev/null 2>&1; then
+    gnome-terminal -- bash -c "tail -f \"$LOG_FILE\"; exec bash" &
+  elif command -v xterm >/dev/null 2>&1; then
+    xterm -e "tail -f \"$LOG_FILE\"" &
+  else
+    echo "⚠ Could not open a new terminal for live log. Please 'tail -f $LOG_FILE' yourself." >&2
+  fi
+fi
+
+# === Send all output to log file only (new terminal will show it live) ===
+exec > "$LOG_FILE" 2>&1
+
+# === Set environment manually for non-interactive shells ===
+export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
+
 # === Configuration ===
 PYTHON_VERSION="3.11.7"
 VENV_NAME="autosedia_venv"
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REQ_FILE="$SCRIPT_DIR/requirements.txt"
 
 # === Helper: print & run ===
@@ -17,31 +53,30 @@ run() {
 if command -v pyenv >/dev/null 2>&1; then
   echo "pyenv detected, skipping installation"
 else
-  echo "pyenv not found, installing…"
-  OS="$(uname)"
+  echo "pyenv not found, attempting installation…"
   if [[ "$OS" == "Darwin" ]]; then
     # macOS: install via Homebrew
     if ! command -v brew >/dev/null 2>&1; then
-      echo "Homebrew not found. Please install Homebrew first: https://brew.sh/"
+      echo "Homebrew not found in PATH: $PATH"
+      echo "Please install Homebrew manually: https://brew.sh/"
       exit 1
     fi
-    echo "Updating Homebrew & installing pyenv"
+    echo "→ Installing pyenv via Homebrew"
     brew update
     brew install pyenv
 
   elif [[ "$OS" == "Linux" ]]; then
-    # Linux: install build essentials & pyenv
-    echo "Installing build tools and dependencies"
+    echo "→ Installing build tools for Linux"
     if command -v apt-get >/dev/null 2>&1; then
       sudo apt-get update
-      sudo apt-get install -y
+      sudo apt-get install -y build-essential curl
     elif command -v yum >/dev/null 2>&1; then
       sudo yum groupinstall -y "Development Tools"
-      sudo yum install -y
+      sudo yum install -y curl
     else
-      echo "Neither apt-get nor yum found; please install dependencies manually." >&2
+      echo "Neither apt-get nor yum found; install dependencies manually." >&2
     fi
-    echo "Bootstrapping pyenv installer"
+    echo "→ Installing pyenv via installer script"
     curl https://pyenv.run | bash
 
   else
@@ -98,7 +133,7 @@ run pip install --upgrade pip
 if [[ -f "$REQ_FILE" ]]; then
   run pip install -r "$REQ_FILE"
 else
-  echo "requirements.txt not found at $REQ_FILE"
+  echo "⚠ requirements.txt not found at $REQ_FILE"
 fi
 
 # === 6. Deactivate ===

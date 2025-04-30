@@ -35,9 +35,12 @@ A command-line tool to automate data ingestion, processing, segmentation, and pl
 
 ## Installation
 
-There are two ways to easily install. If you are familiar with the UNIX environment, Poetry, and Python, then simple create your virtual environment with Python3.11.7 and use 'poetry install' once you cd to directory housing the .toml file. All dependencies with be installed automatically. 
+There are three ways to easily install. If you are familiar with the UNIX environment, Poetry, and Python, then simple create your virtual environment with Python3.11.7 and use 'poetry install' once you cd to directory housing the .toml file. All dependencies with be installed automatically. 
 
-If you are not familiar with such things, then the easiest way to install this software is to clone the directory (on download the zip and unzip in) and then open a terminal in autosedia directory containing the setup_autosedia.sh and run_autosedia.sh scripts. Then at the terminal window, type:
+If you are not familiar with such things and you are using MacOS, then the easiest way to install this software is to use the supplied .dmg file. Put the .dmg in your User directory (not documents, downloads, etc - this is important) and simply double click it to mount, then drag the autosedia folder to a new location on your computer and unmount the .dmg. Then navigate to the setup_autosedia.app and double click it. It will probably prompt you for a password.
+
+Another method that should work on both MacOS and Linux is to
+clone the directory (or download the zip and unzip in) and then open a terminal in the autosedia directory containing the setup_autosedia.sh and run_autosedia.sh scripts. Then at the terminal window, type:
 ```bash
 chmod +x ./setup_autosedia.sh
 ```
@@ -55,7 +58,7 @@ First, make sure your your raw images are in .tiff format and named mask01.tiff,
 ```bash
 python ./autosedia.py
 ```
-If you are not familiar with Python, then open a terminal in the autosedia directory containing the setup_autosedia.sh and run_autosedia.sh scripts. Then at the terminal window, type:
+If you are not familiar with Python, and your installed using the .dmg, then simply souble click on the run_autosedia.app, otherwise open a terminal in the autosedia directory containing the setup_autosedia.sh and run_autosedia.sh scripts. Then at the terminal window, type:
 ```bash
 chmod +x ./run_autosedia.sh
 ```

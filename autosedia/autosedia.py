@@ -21,6 +21,7 @@ __author__ = ["Mitchell Taylor"]
 
 
 import os
+from pathlib import Path
 import sys
 import math
 import matplotlib.pyplot as plt
@@ -462,13 +463,20 @@ def main():
 	import argparse
 	from argparse import RawTextHelpFormatter
 
-	directory = os.getcwd()
+	SCRIPT_DIR = os.environ.get("AUTOSEDIA_SCRIPT_DIR")
+	if SCRIPT_DIR:
+		SCRIPT_DIR = str(Path(SCRIPT_DIR))
+	else:
+		SCRIPT_DIR = str(Path.cwd())
+
+	#directory = os.getcwd()
+	directory = SCRIPT_DIR
 	current_datetime = datetime.now().strftime("%Y-%m-%d %H-%M-%S")
 	raw_image_directory = directory+'/data/RawImages'
 	pre_image_directory = directory+'/data/ManualBinary'
 	num_raw_images = int(len([entry for entry in os.listdir(raw_image_directory) if os.path.isfile(os.path.join(raw_image_directory, entry))])/2) # counts number of images
 	num_pre_images = int(len([entry for entry in os.listdir(pre_image_directory) if os.path.isfile(os.path.join(pre_image_directory, entry))])/2) # counts number of images
-	output_parentDirectory = directory+'/data/OutputFiles'
+	output_parentDirectory = directory+'/data/OutputFiles/'
 	output_childDirectory = directory+'/data/OutputFiles/'+str(current_datetime)
 
 	ap = argparse.ArgumentParser(
